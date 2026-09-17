@@ -1,0 +1,64 @@
+@model IEnumerable<DTS.Application.DTOs.UserDto>
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-users me-2"></i>Users</h2>
+</div>
+
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Roles</th>
+                <th>Status</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-circle" style="width:32px;height:32px;font-size:14px;">@user.FullName[0]</div>
+                            <span>@user.FullName</span>
+                        </div>
+                    </td>
+                    <td>@user.Email</td>
+                    <td>
+                        @foreach (var role in user.Roles)
+                        {
+                            <span class="badge bg-secondary me-1">@role</span>
+                        }
+                    </td>
+                    <td>
+                        @if (user.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </td>
+                    <td>@(user.LastLoginAt?.ToString("MMM dd, HH:mm") ?? "Never")</td>
+                    <td>
+                        <a href="/Admin/UserDetails/@user.Id" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a>
+                        <form asp-action="ToggleUserStatus" asp-route-id="@user.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm @(user.IsActive ? "btn-outline-warning" : "btn-outline-success")">
+                                <i class="fas @(user.IsActive ? "fa-ban" : "fa-check")"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

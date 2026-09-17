@@ -1,0 +1,185 @@
+@model DTS.Application.DTOs.DashboardDto
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h2>
+    <span class="text-muted">@DateTime.Now.ToString("dddd, MMMM dd, yyyy")</span>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="dashboard-card">
+            <div class="card-icon primary"><i class="fas fa-project-diagram"></i></div>
+            <div class="card-value">@Model.TotalProjects</div>
+            <div class="card-label">Total Projects</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="dashboard-card warning">
+            <div class="card-icon warning"><i class="fas fa-bug"></i></div>
+            <div class="card-value">@Model.TotalDefects</div>
+            <div class="card-label">Total Defects</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="dashboard-card success">
+            <div class="card-icon success"><i class="fas fa-check-circle"></i></div>
+            <div class="card-value">@Model.ClosedDefects</div>
+            <div class="card-label">Closed Defects</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="dashboard-card danger">
+            <div class="card-icon danger"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="card-value">@Model.CriticalDefects</div>
+            <div class="card-label">Critical Defects</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="dashboard-card info">
+            <div class="card-icon info"><i class="fas fa-folder-open"></i></div>
+            <div class="card-value">@Model.OpenDefects</div>
+            <div class="card-label">Open Defects</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="dashboard-card primary">
+            <div class="card-icon primary"><i class="fas fa-user-check"></i></div>
+            <div class="card-value">@Model.AssignedDefects</div>
+            <div class="card-label">Assigned Defects</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="dashboard-card warning">
+            <div class="card-icon warning"><i class="fas fa-clock"></i></div>
+            <div class="card-value">@Model.PendingDefects</div>
+            <div class="card-label">Pending Defects</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="dashboard-card success">
+            <div class="card-icon success"><i class="fas fa-percentage"></i></div>
+            <div class="card-value">@(Model.TotalDefects > 0 ? (Model.ClosedDefects * 100 / Model.TotalDefects) : 0)%</div>
+            <div class="card-label">Resolution Rate</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="chart-container">
+            <h5 class="mb-4"><i class="fas fa-chart-line me-2"></i>Monthly Defect Trends</h5>
+            <canvas id="monthlyTrendChart" height="100"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="chart-container">
+            <h5 class="mb-4"><i class="fas fa-list-alt me-2"></i>Recent Activities</h5>
+            <div class="activity-feed">
+                @if (Model.RecentActivities.Any())
+                {
+                    @foreach (var activity in Model.RecentActivities)
+                    {
+                        <div class="activity-item">
+                            <div class="activity-icon bg-@activity.Color-subtle text-@activity.Color">
+                                <i class="fas @activity.Icon"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0">@activity.Description</p>
+                                <small class="text-muted">@activity.UserName - @activity.Timestamp.ToString("MMM dd, HH:mm")</small>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-4 text-muted">No recent activities</div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="chart-container">
+            <h5 class="mb-4">Defects by Status</h5>
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="chart-container">
+            <h5 class="mb-4">Defects by Priority</h5>
+            <canvas id="priorityChart"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="chart-container">
+            <h5 class="mb-4">Defects by Severity</h5>
+            <canvas id="severityChart"></canvas>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const statusData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DefectsByStatus));
+    const priorityData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DefectsByPriority));
+    const severityData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DefectsBySeverity));
+    const monthlyData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyTrends));
+
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: statusData.map(d => d.Label),
+            datasets: [{
+                data: statusData.map(d => d.Value),
+                backgroundColor: ['#2563eb', '#f59e0b', '#3b82f6', '#10b981', '#ec4899', '#6b7280', '#ef4444']
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    new Chart(document.getElementById('priorityChart'), {
+        type: 'doughnut',
+        data: {
+            labels: priorityData.map(d => d.Label),
+            datasets: [{
+                data: priorityData.map(d => d.Value),
+                backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#7c3aed']
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    new Chart(document.getElementById('severityChart'), {
+        type: 'doughnut',
+        data: {
+            labels: severityData.map(d => d.Label),
+            datasets: [{
+                data: severityData.map(d => d.Value),
+                backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#7c3aed']
+            }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+    });
+
+    new Chart(document.getElementById('monthlyTrendChart'), {
+        type: 'line',
+        data: {
+            labels: monthlyData.map(d => d.Month),
+            datasets: [
+                { label: 'Created', data: monthlyData.map(d => d.Created), borderColor: '#2563eb', backgroundColor: 'rgba(37,99,235,0.1)', fill: true, tension: 0.4 },
+                { label: 'Closed', data: monthlyData.map(d => d.Closed), borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', fill: true, tension: 0.4 }
+            ]
+        },
+        options: { responsive: true, interaction: { mode: 'index', intersect: false } }
+    });
+</script>
+}

@@ -1,0 +1,58 @@
+@model DTS.Application.DTOs.DefectUpdateDto
+
+@{
+    ViewData["Title"] = "Edit Defect";
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-edit me-2"></i>Edit Defect</h2>
+    <a href="/Defect/Details/@Model.Id" class="btn btn-outline-secondary">Back to Details</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="form-card">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Title</label>
+                    <input asp-for="Title" class="form-control" placeholder="Enter defect title" />
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the defect"></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="StepsToReproduce" class="form-label">Steps to Reproduce</label>
+                    <textarea asp-for="StepsToReproduce" class="form-control" rows="3" placeholder="Steps to reproduce the defect"></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Severity" class="form-label">Severity</label>
+                        <select asp-for="Severity" class="form-select" asp-items="Html.GetEnumSelectList<DTS.Domain.Enums.DefectSeverity>()"></select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Priority" class="form-label">Priority</label>
+                        <select asp-for="Priority" class="form-select" asp-items="Html.GetEnumSelectList<DTS.Domain.Enums.DefectPriority>()"></select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="ExpectedResolutionDate" class="form-label">Expected Resolution</label>
+                        <input asp-for="ExpectedResolutionDate" type="date" class="form-control" />
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="/Defect/Details/@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

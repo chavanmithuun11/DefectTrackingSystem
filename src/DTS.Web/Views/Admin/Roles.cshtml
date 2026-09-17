@@ -1,0 +1,51 @@
+@model List<Microsoft.AspNetCore.Identity.IdentityRole>
+
+@{
+    ViewData["Title"] = "Roles";
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-user-shield me-2"></i>Roles</h2>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="form-card">
+            <h5 class="mb-3">Create New Role</h5>
+            <form asp-action="CreateRole" method="post">
+                @Html.AntiForgeryToken()
+                <div class="input-group">
+                    <input type="text" name="roleName" class="form-control" placeholder="Role name" required />
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-plus me-1"></i>Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Role Name</th>
+                <th>Normalized Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var role in Model)
+            {
+                <tr>
+                    <td><span class="badge bg-primary">@role.Name</span></td>
+                    <td>@role.NormalizedName</td>
+                    <td>
+                        <form asp-action="DeleteRole" asp-route-id="@role.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this role?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

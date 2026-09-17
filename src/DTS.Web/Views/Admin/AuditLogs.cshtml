@@ -1,0 +1,42 @@
+@model List<DTS.Application.DTOs.AuditLogDto>
+
+@{
+    ViewData["Title"] = "Audit Logs";
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-history me-2"></i>Audit Logs</h2>
+</div>
+
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Time</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Entity ID</th>
+                <th>IP Address</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in Model)
+            {
+                <tr>
+                    <td>@log.CreatedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-circle" style="width:28px;height:28px;font-size:12px;">@log.UserName[0]</div>
+                            <span>@log.UserName</span>
+                        </div>
+                    </td>
+                    <td><span class="badge bg-info">@log.Action</span></td>
+                    <td>@log.EntityName</td>
+                    <td><code>@log.EntityId</code></td>
+                    <td><span class="text-muted">@log.IpAddress</span></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

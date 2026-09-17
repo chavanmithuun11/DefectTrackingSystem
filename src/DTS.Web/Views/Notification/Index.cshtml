@@ -1,0 +1,74 @@
+@model IEnumerable<DTS.Application.DTOs.NotificationDto>
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-bell me-2"></i>Notifications</h2>
+    <button class="btn btn-outline-secondary" onclick="markAllRead()"><i class="fas fa-check-double me-2"></i>Mark All Read</button>
+</div>
+
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Any())
+            {
+                @foreach (var notification in Model)
+                {
+                    <tr class="@(!notification.IsRead ? "table-primary" : "")">
+                        <td><span class="badge bg-info">@notification.TypeName</span></td>
+                        <td class="fw-medium">@notification.Title</td>
+                        <td>@notification.Message</td>
+                        <td>@notification.CreatedAt.ToString("MMM dd, HH:mm")</td>
+                        <td>
+                            @if (notification.IsRead)
+                            {
+                                <span class="badge bg-secondary">Read</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-primary">Unread</span>
+                            }
+                        </td>
+                        <td>
+                            @if (!notification.IsRead)
+                            {
+                                <button class="btn btn-sm btn-outline-primary" onclick="markRead(@notification.Id)"><i class="fas fa-check"></i></button>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="6" class="text-center py-5 text-muted">No notifications.</td></tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+<script>
+    function markRead(id) {
+        $.post('/Notification/MarkAsRead', { id: id }, function() {
+            location.reload();
+        });
+    }
+    function markAllRead() {
+        $.post('/Notification/MarkAllAsRead', function() {
+            location.reload();
+        });
+    }
+</script>
+}

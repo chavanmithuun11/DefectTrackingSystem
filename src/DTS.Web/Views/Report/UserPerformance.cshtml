@@ -1,0 +1,50 @@
+@model List<DTS.Application.DTOs.UserPerformanceDto>
+
+@{
+    ViewData["Title"] = "User Performance Report";
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-users me-2"></i>User Performance Report</h2>
+    <a href="/Report" class="btn btn-outline-secondary">Back to Reports</a>
+</div>
+
+<div class="data-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Developer</th>
+                <th>Total Assigned</th>
+                <th>Resolved</th>
+                <th>In Progress</th>
+                <th>Open</th>
+                <th>Resolution Rate</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-circle" style="width:32px;height:32px;font-size:14px;">@item.UserName[0]</div>
+                            <span>@item.UserName</span>
+                        </div>
+                    </td>
+                    <td>@item.TotalAssigned</td>
+                    <td><span class="badge bg-success">@item.Resolved</span></td>
+                    <td><span class="badge bg-info">@item.InProgress</span></td>
+                    <td><span class="badge bg-warning">@item.Open</span></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="progress flex-grow-1" style="height:8px;min-width:80px;">
+                                <div class="progress-bar @(item.ResolutionRate >= 70 ? "bg-success" : item.ResolutionRate >= 40 ? "bg-warning" : "bg-danger")" style="width:@item.ResolutionRate%"></div>
+                            </div>
+                            <span class="small text-muted">@item.ResolutionRate.ToString("F1")%</span>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,94 @@
+@model DTS.Application.DTOs.DefectSummaryReportDto
+
+@{
+    ViewData["Title"] = "Defect Summary Report";
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-bug me-2"></i>Defect Summary Report</h2>
+    <a href="/Report" class="btn btn-outline-secondary">Back to Reports</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 col-lg-2">
+        <div class="dashboard-card text-center">
+            <div class="stat-value">@Model.TotalDefects</div>
+            <div class="stat-label">Total Defects</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="dashboard-card text-center">
+            <div class="stat-value text-warning">@Model.OpenDefects</div>
+            <div class="stat-label">Open</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="dashboard-card text-center">
+            <div class="stat-value text-success">@Model.ClosedDefects</div>
+            <div class="stat-label">Closed</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="dashboard-card text-center">
+            <div class="stat-value text-danger">@Model.CriticalDefects</div>
+            <div class="stat-label">Critical</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="dashboard-card text-center">
+            <div class="stat-value text-danger">@Model.HighPriorityDefects</div>
+            <div class="stat-label">High Priority</div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="dashboard-card text-center">
+            <div class="stat-value text-info">@Model.AverageResolutionDays.ToString("F1")</div>
+            <div class="stat-label">Avg Resolution (Days)</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="form-card">
+            <h5 class="mb-3">By Status</h5>
+            <div class="data-table">
+                <table class="table">
+                    <thead>
+                        <tr><th>Status</th><th>Count</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.StatusSummary)
+                        {
+                            <tr>
+                                <td><span class="badge bg-primary">@item.Status</span></td>
+                                <td>@item.Count</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="form-card">
+            <h5 class="mb-3">By Severity</h5>
+            <div class="data-table">
+                <table class="table">
+                    <thead>
+                        <tr><th>Severity</th><th>Count</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.SeveritySummary)
+                        {
+                            <tr>
+                                <td><span class="badge bg-warning">@item.Severity</span></td>
+                                <td>@item.Count</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

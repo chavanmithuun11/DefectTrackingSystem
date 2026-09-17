@@ -1,0 +1,175 @@
+@model DTS.Application.DTOs.DefectDto
+
+@{
+    ViewData["Title"] = Model.DefectId;
+    var comments = ViewBag.Comments as List<DTS.Application.DTOs.DefectCommentDto> ?? new();
+    var attachments = ViewBag.Attachments as List<DTS.Application.DTOs.DefectAttachmentDto> ?? new();
+    var developers = ViewBag.Developers as List<DTS.Domain.Entities.AppUser> ?? new();
+    var canEdit = ViewBag.CanEdit as bool? ?? false;
+    var canAssign = ViewBag.CanAssign as bool? ?? false;
+    var canChangeStatus = ViewBag.CanChangeStatus as bool? ?? false;
+}
+
+<div class="page-header">
+    <h2><i class="fas fa-bug me-2"></i>@Model.DefectId</h2>
+    <div class="d-flex gap-2">
+        @if (canEdit)
+        {
+            <a href="/Defect/Edit/@Model.Id" class="btn btn-outline-secondary"><i class="fas fa-edit me-2"></i>Edit</a>
+        }
+        <a href="/Defect" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="form-card mb-4">
+            <h5 class="mb-3">@Model.Title</h5>
+            <div class="mb-3 d-flex flex-wrap gap-2">
+                <span class="badge-status badge-status-@Model.StatusName.ToLower()">@Model.StatusName</span>
+                <span class="badge-severity-@Model.SeverityName.ToLower() badge-status">@Model.SeverityName</span>
+                <span class="badge-status badge-status-@Model.PriorityName.ToLower()">@Model.PriorityName</span>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6"><strong>Project:</strong> @Model.ProjectName</div>
+                <div class="col-md-6"><strong>Reported By:</strong> @Model.ReportedByName</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6"><strong>Assigned To:</strong> @(Model.AssignedToName ?? "Unassigned")</div>
+                <div class="col-md-6"><strong>Created:</strong> @Model.CreatedAt.ToString("MMM dd, yyyy HH:mm")</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6"><strong>Expected Resolution:</strong> @(Model.ExpectedResolutionDate?.ToString("MMM dd, yyyy") ?? "Not set")</div>
+                <div class="col-md-6"><strong>Actual Resolution:</strong> @(Model.ActualResolutionDate?.ToString("MMM dd, yyyy") ?? "-")</div>
+            </div>
+            <div class="mb-3">
+                <strong>Description:</strong>
+                <p class="text-muted mt-1">@Model.Description</p>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.StepsToReproduce))
+            {
+                <div class="mb-3">
+                    <strong>Steps to Reproduce:</strong>
+                    <p class="text-muted mt-1">@Model.StepsToReproduce</p>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(Model.ResolutionNotes))
+            {
+                <div class="mb-3">
+                    <strong>Resolution Notes:</strong>
+                    <p class="text-muted mt-1">@Model.ResolutionNotes</p>
+                </div>
+            }
+        </div>
+
+        @if (canAssign)
+        {
+            <div class="form-card mb-4">
+                <h5 class="mb-3">Assign Defect</h5>
+                <form asp-action="Assign" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="DefectId" value="@Model.Id" />
+                    <div class="row g-2">
+                        <div class="col-md-8">
+                            <select name="AssignedToId" class="form-select">
+                                <option value="">Unassigned</option>
+                                @foreach (var dev in developers)
+                                {
+                                    <option value="@dev.Id" selected="@(Model.AssignedToId == dev.Id ? "selected" : null)">@dev.FullName</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">Assign</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        }
+
+        @if (canChangeStatus)
+        {
+            <div class="form-card mb-4">
+                <h5 class="mb-3">Change Status</h5>
+                <form asp-action="ChangeStatus" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="DefectId" value="@Model.Id" />
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <select name="Status" class="form-select" asp-items="Html.GetEnumSelectList<DTS.Domain.Enums.DefectStatus>()"></select>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="text" name="ResolutionNotes" class="form-control" placeholder="Resolution notes (optional)" />
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        }
+
+        <div class="form-card mb-4">
+            <h5 class="mb-3"><i class="fas fa-comments me-2"></i>Comments (@comments.Count)</h5>
+            <div class="comments-list mb-4">
+                @if (comments.Any())
+                {
+                    @foreach (var comment in comments)
+                    {
+                        <div class="border-bottom pb-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar-circle" style="width:28px;height:28px;font-size:12px;">@comment.UserName[0]</div>
+                                    <strong class="small">@comment.UserName</strong>
+                                    <span class="text-muted small">@comment.CreatedAt.ToString("MMM dd, HH:mm")</span>
+                                </div>
+                                @if (comment.IsOwnComment)
+                                {
+                                    <form asp-controller="DefectComment" asp-action="Delete" asp-route-id="@comment.Id" method="post" class="d-inline" onsubmit="return confirm('Delete this comment?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-link btn-sm text-danger p-0"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                }
+                            </div>
+                            <p class="mb-0 mt-2 text-muted">@comment.Content</p>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-3 text-muted">No comments yet.</div>
+                }
+            </div>
+            <form asp-controller="DefectComment" asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="DefectId" value="@Model.Id" />
+                <div class="input-group">
+                    <input type="text" name="Content" class="form-control" placeholder="Add a comment..." required />
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="form-card">
+            <h5 class="mb-3"><i class="fas fa-paperclip me-2"></i>Attachments (@attachments.Count)</h5>
+            @if (attachments.Any())
+            {
+                @foreach (var att in attachments)
+                {
+                    <div class="d-flex align-items-center gap-2 mb-2 p-2 bg-light rounded">
+                        <i class="fas fa-file text-muted"></i>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="small text-truncate">@att.OriginalFileName</div>
+                            <div class="text-muted" style="font-size:11px;">@att.UploadedByName - @(att.FileSize / 1024) KB</div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center py-3 text-muted">No attachments.</div>
+            }
+        </div>
+    </div>
+</div>

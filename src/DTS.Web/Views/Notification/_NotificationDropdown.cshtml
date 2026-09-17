@@ -1,0 +1,58 @@
+@model List<DTS.Application.DTOs.NotificationDto>
+
+@foreach (var notification in Model)
+{
+    <a href="@(notification.Url ?? "#")" class="dropdown-item notification-item @(notification.IsRead ? "read" : "unread")" data-id="@notification.Id">
+        <div class="d-flex align-items-start gap-2">
+            <div class="notification-icon">
+                @switch (notification.Type)
+                {
+                    case DTS.Domain.Enums.NotificationType.DefectAssigned:
+                        <i class="fas fa-user-tag text-primary"></i>
+                        break;
+                    case DTS.Domain.Enums.NotificationType.StatusUpdated:
+                        <i class="fas fa-sync-alt text-info"></i>
+                        break;
+                    case DTS.Domain.Enums.NotificationType.DefectClosed:
+                        <i class="fas fa-check-circle text-success"></i>
+                        break;
+                    case DTS.Domain.Enums.NotificationType.CommentAdded:
+                        <i class="fas fa-comment text-success"></i>
+                        break;
+                    case DTS.Domain.Enums.NotificationType.ProjectAssigned:
+                        <i class="fas fa-plus-circle text-warning"></i>
+                        break;
+                    case DTS.Domain.Enums.NotificationType.PasswordReset:
+                        <i class="fas fa-key text-secondary"></i>
+                        break;
+                    default:
+                        <i class="fas fa-bell text-secondary"></i>
+                        break;
+                }
+            </div>
+            <div class="flex-grow-1">
+                <p class="mb-0 small fw-semibold">@notification.Title</p>
+                <p class="mb-0 small text-muted text-truncate" style="max-width:200px;">@notification.Message</p>
+                <p class="mb-0 small text-muted">@notification.CreatedAt.ToString("MMM dd, HH:mm")</p>
+            </div>
+            @if (!notification.IsRead)
+            {
+                <span class="badge bg-primary rounded-circle" style="width:8px;height:8px;padding:0;"></span>
+            }
+        </div>
+    </a>
+}
+@if (!Model.Any())
+{
+    <div class="dropdown-item text-center text-muted py-3">
+        <i class="fas fa-bell-slash mb-2 d-block" style="font-size:1.5rem;"></i>
+        No notifications
+    </div>
+}
+else
+{
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-item text-center">
+        <button class="btn btn-link btn-sm text-decoration-none" onclick="markAllNotificationsRead()">Mark all as read</button>
+    </div>
+}
