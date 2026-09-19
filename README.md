@@ -46,10 +46,6 @@ The project follows a layered architecture with separate components for:
 
 ![Dashboard](screenshots/dashboard.png)
 
-### ➕ Create Defect
-
-![Create Defect](screenshots/create-defect.png)
-
 ### 🐞 Defects
 
 ![Defects](screenshots/defects.png)
@@ -57,6 +53,11 @@ The project follows a layered architecture with separate components for:
 ### 👥 Roles
 
 ![Roles](screenshots/roles.png)
+
+### ➕ Create Defect
+
+![Create Defect](screenshots/create-defect.png)
+
 
 ## ⚙️ Getting Started
 
