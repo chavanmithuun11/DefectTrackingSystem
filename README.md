@@ -40,24 +40,24 @@ The project follows a layered architecture with separate components for:
 
 ### 🔐 Login
 
-![Login](screenshots/login.png)
+![Login](screenshots/dts-3d-1-login.png)
 
 ### 📊 Dashboard
 
-![Dashboard](screenshots/dashboard.png)
+![Dashboard](screenshots/dts-3d-2-dashboard.png)
 
 ### 🐞 Defects
 
-![Defects](screenshots/defects.png)
+![Projects](screenshots/dts-3d-3-projects.png)
 
 ### 👥 Roles
 
-![Roles](screenshots/roles.png)
+![Roles](screenshots/dts-3d-4-roles.png)
 
 ### ➕ Create Defect
 
-![Create Defect](screenshots/create-defect.png)
 
+![Create Project](screenshots/dts-3d-5-create-project.png)
 
 ## ⚙️ Getting Started
 
